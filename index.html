@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <title>Index</title>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+  </head>
+  <body>
+     <div class="cover"></div>
+     <div class="musicbox">
+       <div class="music-panel">
+         <div class="music">
+           <div class="info">
+             <div class="title-container">
+               <div class="icon-playing">
+                 <span class="line1"></span>
+                 <span class="line2"></span>
+                 <span class="line3"></span>
+                 <span class="line4"></span>
+               </div>
+               <div class="title">My song example</div>
+             </div>
+             <div class="auther">auther</div>
+           </div>
+           <div class="musicImgContent">
+             <div>
+              <img src="" class="musicImg" id="musicImg">
+             </div>
+           </div>
+           <div class="control">
+             <span class="play-button" id="list">
+               <i class="iconfont icon-list1"></i>
+             </span>
+             <span class="play-button" id="previous">
+               <i class="iconfont icon-PrevioustrackFill"></i>
+             </span>
+             <span class="play-button" id="play">
+               <i class="iconfont icon-PlayFilled"></i>
+             </span>
+             <span class="play-button" id="next">
+               <i class="iconfont icon-NexttrackFilled"></i>
+             </span>
+             <span class="play-button">
+               <i class="iconfont icon-xunhuanbofang"></i>
+             </span>
+           </div>
+           <ul id="music-list-content" class="music-list-content">     
+           </ul>
+         <div class="progress">
+           <div class="bar">
+             <div class="progress-total"></div>
+             <div class="progress-now"></div>
+           </div>
+         </div>
+         <div class="time">0:00</div>
+         </div>
+       </div>
+     </div>
+  </body>
+</html>
+<script>
+  /* Delete mock date musicList when you run local host*/
+  const musicList = [
+    {
+        id: "01",
+        title: "Bye Bye Bye",
+        auther: "Lovestoned",
+        img: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/img/01.jpg",
+        url: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/music/ByeByeBye.mp3"
+    },
+    {
+        id: "02",
+        title: "Never Change",
+        auther: "Chase Coy",
+        img: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/img/02.jpg",
+        url: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/music/NeverChange.mp3"
+    },
+    {
+        id: "03",
+        title: "It Is You",
+        auther: "Tom Hugo",
+        img: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/img/03.jpg",
+        url: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/music/ItIsYou.mp3"
+    },
+     {
+        id: "04",
+        title: "Vendredi",
+        auther: "Tamas Wells",
+        img: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/img/04.jpg",
+        url: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/music/Vendredi.mp3"
+    },
+     {
+        id: "05",
+        title: "Stuttering",
+        auther: "Fefe Dobson",
+        img: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/img/05.jpg",
+        url: "https://kisky3.github.io/Jirengu/Jirengu_task31/music-player/music/Stuttering.mp3"
+    },
+]
+
+  let currentIndex = 0;
+  const clock = null;
+  const audio = new Audio();
+  /* Uncomment when you run local host*/
+  /*let musicList = [];*/
+  audio.autoplay = false;
+  let playButton = document.getElementById('play');
+  let nextButton = document.getElementById('next');
+  let previousButton = document.getElementById('previous');
+  let listButton = document.getElementById('list');
+  let musicImg = document.getElementById('musicImg');
+  let musicListItems = [];
+  let musicListContent = document.getElementById('music-list-content');
+  let musicListContentLiTag = musicListContent.getElementsByTagName('li');
+
+  const playClassList = playButton.children[0].classList;
+  const nextClassList = nextButton.children[0].classList;
+
+  $('.musicbox .musicImgContent').style.animationPlayState = "paused";
+  $('.musicbox .musicImg').style.animationPlayState = "paused";
+
+  $('.musicbox .bar').onclick = function(e){
+    const percent = e.offsetX / parseInt(getComputedStyle(this).width);
+    audio.currentTime = audio.duration * percent;
+  }
+  
+  $('.title-container .icon-playing').onclick = function(){
+    showMusicList();
+  }
+  
+  function showMusicList() {
+    if(musicListContent.style.display === ''){
+       musicListContent.style.display = 'inline-block';
+    } else {
+      musicListContent.style.display = '';
+    }
+  }
+
+  function createMusicList() {
+    if(musicList.length !== 0){
+       musicList.forEach(function(value){
+         musicListItems.push('<li>'+ value.title + '</li>');
+       });
+      musicListContent.innerHTML = musicListItems.join('');
+    }
+  }
+
+  listButton.onclick = function() {
+    showMusicList();
+  }
+
+  playButton.onclick = function(){ 
+    if(playClassList.contains('icon-PlayFilled')){  
+       audio.play();
+    } else {
+       audio.pause();
+    }
+  }
+
+  nextButton.onclick = function(){
+    if(musicList.length !== 0){
+      currentIndex = (++currentIndex)%musicList.length;
+      loadMusic(musicList[currentIndex]);
+    }
+  }
+
+  previousButton.onclick = function(){
+    if(musicList.length !== 0){
+      currentIndex = (musicList.length + (--currentIndex))%musicList.length;
+      loadMusic(musicList[currentIndex]);
+    }
+  }
+  
+  audio.onended = function(){
+    currentIndex = (++currentIndex)%musicList.length;
+    loadMusic(musicList[currentIndex]);
+  }
+
+  audio.ontimeupdate = function(){
+    $('.musicbox .progress-now').style.width = (this.currentTime/this.duration)*100 + '%';
+    let min = Math.floor(this.currentTime / 60);
+    let sec = Math.floor(this.currentTime) % 60 + '';
+    sec = sec.length === 2? sec : '0' + sec;
+    $('.musicbox .time').innerText = min + ':' + sec;
+  }
+
+  audio.addEventListener('playing',function(){ 
+    playClassList.remove('icon-PlayFilled');
+    playClassList.add('icon-PauseFilled');
+    //run music background animation
+    $('.musicbox .musicImgContent').style.animationPlayState = "running";
+    $('.musicbox .musicImg').style.animationPlayState = "running";
+    
+    //start music mark animation 
+    $('.title-container .icon-playing').style.display = "inline-block";
+  });
+
+   audio.addEventListener('pause',function(){
+    playClassList.remove('icon-PauseFilled');
+    playClassList.add('icon-PlayFilled');
+    //pause music background animation
+    $('.musicbox .musicImgContent').style.animationPlayState = "paused";
+    $('.musicbox .musicImg').style.animationPlayState = "paused";
+
+    //stop music mark animation 
+    $('.title-container .icon-playing').style.display = "none";
+  })
+
+  audio.onpause = function(){
+    clearInterval(clock);
+  }
+
+  function $(selector){
+    return document.querySelector(selector);
+  }
+
+  function loadMusic(musicObj){  
+    $('.musicbox .title').innerText = musicObj.title;
+    $('.musicbox .auther').innerText = musicObj.auther;
+    
+    musicImg.src = musicObj.img;
+
+    audio.src = musicObj.url;
+    audio.play();
+  }
+
+  function clickMusicItem(){
+   for(var i=0;i<musicListContentLiTag.length;i++){
+     musicListContentLiTag[i].onclick=(function(i){ 
+  　　  return function(){
+          currentIndex = i;
+  　　    loadMusic(musicList[currentIndex]);
+  　　  }
+     }(i))
+　　}
+  }
+
+  loadMusic(musicList[currentIndex]);
+  createMusicList();
+  clickMusicItem();
+
+  /* Uncomment when you run local host*/
+  /*getMusicList(function(musicList) { 
+     musicList = list;
+    loadMusic(musicList[currentIndex]);
+  })*/
+
+  /*function getMusicList(callback){
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET','/getMusicList',true);
+    xhr.onload = function(){
+      if((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304){
+        callback(JSON.parse(this.responseText));
+      }else{
+        console.log('获取数据失败');
+      }
+    }
+    xhr.onerror = function(){
+      console.log('网络异常');
+    }
+    xhr.send();
+  }*/
+</script>
